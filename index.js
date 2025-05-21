@@ -33,6 +33,11 @@ async function run() {
 
     const gardenCollection = client.db('gardenDB').collection('ShareTips');
 
+    app.get('/addTips', async (req, res) => {
+    const result = await gardenCollection.find().toArray();
+    res.send(result);
+    });
+
 
     app.post('/addTips', async (req, res) => {
       const shareTips = req.body;

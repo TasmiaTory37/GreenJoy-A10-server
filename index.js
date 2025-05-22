@@ -86,7 +86,7 @@ async function run() {
     }
     });
 
-    //Get Active Gardeners for homepage
+    //Get Active Gardeners in homepage
     app.get('/activeGardeners', async (req, res) => {
         const gardeners = await client.db('gardenDB')
         .collection('gardeners')
@@ -95,6 +95,26 @@ async function run() {
         .toArray();
         res.send(gardeners);
     });
+
+
+
+
+//TipsDetails
+app.get('/tip/:id', async (req, res) => {
+  try {
+    const id = new ObjectId(req.params.id);
+    const tip = await gardenCollection.findOne({ _id: id });
+    if (!tip) {
+      return res.status(404).send({ message: 'Tip not found' });
+    }
+    res.send(tip);
+  } catch (error) {
+    console.error('Error fetching tip:', error);
+    res.status(500).send({ message: 'Server error' });
+  }
+});
+
+
 
 
 

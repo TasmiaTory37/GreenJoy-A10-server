@@ -115,6 +115,25 @@ app.get('/tip/:id', async (req, res) => {
 });
 
 
+//totalLiked
+app.patch('/tip/like/:id', async (req, res) => {
+  try {
+    const id = new ObjectId(req.params.id);
+    const result = await gardenCollection.updateOne(
+      { _id: id },
+      { $inc: { totalLiked: 1 } }
+    );
+    if (result.modifiedCount === 0) {
+      return res.status(404).send({ message: 'Tip not found or like not updated' });
+    }
+    res.send({ message: 'Like count incremented' });
+  } catch (error) {
+    console.error('Error updating like count:', error);
+    res.status(500).send({ message: 'Server error' });
+  }
+});
+
+
 
 
 

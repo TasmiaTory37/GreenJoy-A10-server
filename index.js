@@ -86,6 +86,17 @@ async function run() {
     }
     });
 
+    //Get Active Gardeners for homepage
+    app.get('/activeGardeners', async (req, res) => {
+        const gardeners = await client.db('gardenDB')
+        .collection('gardeners')
+        .find({ status: 'active' })
+        .limit(6)
+        .toArray();
+        res.send(gardeners);
+    });
+
+
 
 
     // Send a ping to confirm a successful connection

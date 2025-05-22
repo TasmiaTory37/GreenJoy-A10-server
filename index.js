@@ -57,6 +57,35 @@ async function run() {
     res.send(result);
     });
 
+    //Get Public or Browse Tips
+    app.get('/publicTips', async (req, res) => {
+    const difficulty = req.query.difficulty;
+    const query = { availability: 'Public' };
+
+    if (difficulty) {
+        query.difficulty = difficulty;
+    }
+
+    const result = await gardenCollection.find(query).toArray();
+    res.send(result);
+    });
+
+
+
+    //Get Explore Gardeners
+    app.get('/gardeners', async (req, res) => {
+        try {
+        const gardeners = await client.db('gardenDB')
+        .collection('gardeners')
+        .find({})
+        .toArray();
+        res.send(gardeners);
+     }   catch (error) {
+        console.error('Error fetching gardeners:', error);
+        res.status(500).send({ message: 'Server error' });
+    }
+    });
+
 
 
     // Send a ping to confirm a successful connection

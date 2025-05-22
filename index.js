@@ -4,6 +4,7 @@ const app = express();
 require('dotenv').config()
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const port = process.env.PORT || 3000;
+const { ObjectId } = require('mongodb');
 app.use(cors());
 app.use(express.json());
 
@@ -33,12 +34,8 @@ async function run() {
 
     const gardenCollection = client.db('gardenDB').collection('ShareTips');
 
-    app.get('/addTips', async (req, res) => {
-    const result = await gardenCollection.find().toArray();
-    res.send(result);
-    });
 
-
+    //Create Tips
     app.post('/addTips', async (req, res) => {
       const shareTips = req.body;
       console.log(shareTips);
@@ -46,11 +43,19 @@ async function run() {
     res.send(result);
     })
 
+//Get add tips
+    app.get('/addTips', async (req, res) => {
+    const result = await gardenCollection.find().toArray();
+    res.send(result);
+    });
 
+//Update Tips
 
-
-
-
+//Delete Tips
+    app.delete('/deleteTip/:id', async (req, res) => {
+    const result = await gardenCollection.deleteOne({ _id: new ObjectId(req.params.id) });
+    res.send(result);
+    });
 
 
 

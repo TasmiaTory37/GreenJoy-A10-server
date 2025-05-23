@@ -10,11 +10,6 @@ app.use(express.json());
 
 
 
-//
-//
-
-
-
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.5w5rxcd.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -51,6 +46,49 @@ async function run() {
 
 //Update Tips
 
+// Get single tip by ID (useful for pre-filling update form)
+app.get('/tip/:id', async (req, res) => {
+try {
+    const id = new ObjectId(req.params.id);
+    const tip = await gardenCollection.findOne({ _id: id });
+    if (!tip) {
+    return res.status(404).send({ message: 'Tip not found' });
+}
+    res.send(tip);
+} catch (error) {
+    res.status(500).send({ message: 'Server error' });
+}
+});
+
+// Update tip by ID
+app.put('/updateTip/:id', async (req, res) => {
+  try {
+    const id = new ObjectId(req.params.id);
+    const updatedTip = req.body;
+    // Optionally remove _id field if present in the update body
+    delete updatedTip._id;
+    
+    const result = await gardenCollection.updateOne(
+      { _id: id },
+      { $set: updatedTip }
+    );
+    if (result.modifiedCount === 0) {
+      return res.status(404).send({ message: 'No tip updated, maybe tip not found' });
+    }
+    res.send({ message: 'Tip updated successfully' });
+  } catch (error) {
+    res.status(500).send({ message: 'Server error' });
+  }
+});
+
+
+
+
+
+
+
+
+
 //Delete Tips
     app.delete('/deleteTip/:id', async (req, res) => {
     const result = await gardenCollection.deleteOne({ _id: new ObjectId(req.params.id) });
@@ -59,14 +97,7 @@ async function run() {
 
     //Get Public or Browse Tips
     app.get('/publicTips', async (req, res) => {
-    const difficulty = req.query.difficulty;
-    const query = { availability: 'Public' };
-
-    if (difficulty) {
-        query.difficulty = difficulty;
-    }
-
-    const result = await gardenCollection.find(query).toArray();
+    const result = await gardenCollection.find({ availability: 'Public' }).toArray();
     res.send(result);
     });
 
@@ -129,9 +160,22 @@ app.patch('/tip/like/:id', async (req, res) => {
     res.send({ message: 'Like count incremented' });
   } catch (error) {
     console.error('Error updating like count:', error);
-    res.status(500).send({ message: 'Server error' });
-  }
+    res.status(500).send({ message: 'Server error'});
+}
 });
+
+
+//TrendingTips in homepage
+    app.get('/topTrendingTips', async (req, res) => {
+        const tips = await gardenCollection
+        .find({ availability: 'Public' })  
+        .sort({ totalLiked: -1 })           
+        .limit(6)                         
+        .toArray();
+        res.send(tips);
+    });
+  
+
 
 
 

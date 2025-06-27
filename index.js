@@ -38,11 +38,20 @@ async function run() {
     res.send(result);
     })
 
-//Get add tips
+// Get Tips (by user email)
     app.get('/addTips', async (req, res) => {
-    const result = await gardenCollection.find().toArray();
-    res.send(result);
+      const { userEmail } = req.query; 
+      if (userEmail) {
+       
+        const result = await gardenCollection.find({ userEmail }).toArray();
+        res.send(result);
+      } else {
+   const result = await gardenCollection.find().toArray();
+        res.send(result);
+      }
     });
+
+
 
 //Update Tips
 
@@ -122,7 +131,7 @@ app.put('/updateTip/:id', async (req, res) => {
         const gardeners = await client.db('gardenDB')
         .collection('gardeners')
         .find({ status: 'active' })
-        .limit(6)
+        .limit(8)
         .toArray();
         res.send(gardeners);
     });
@@ -170,7 +179,7 @@ app.patch('/tip/like/:id', async (req, res) => {
         const tips = await gardenCollection
         .find({ availability: 'Public' })  
         .sort({ totalLiked: -1 })           
-        .limit(6)                         
+        .limit(8)                         
         .toArray();
         res.send(tips);
     });
